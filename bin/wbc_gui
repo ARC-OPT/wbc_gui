@@ -1,0 +1,46 @@
+#!/usr/bin/env ruby
+
+require "vizkit"
+require "optparse"
+require "wbc_status_gui"
+require "wbc_ctrl_gui"
+
+hostname = "localhost"
+vertical_layout = false
+options = OptionParser.new do |opt|
+    opt.banner = <<-EOD
+    wbc_gui <options>
+    EOD
+    opt.on '--host=HOSTNAME', String, 'the host we should contact to find RTT tasks' do |host|
+        hostname = host
+    end
+    opt.on '--vertical_layout', 'Layout the two guys vertically instead of horzontally' do
+        vertical_layout = true
+    end
+    opt.on '--help', 'this help message' do
+        puts opt
+        exit(0)
+    end
+end
+args = options.parse(ARGV)
+
+Orocos::CORBA.name_service.ip = hostname
+Orocos.initialize
+
+wbc_ctrl_gui = Wbc::WbcCtrlGUI.new
+wbc_status_gui = Wbc::WbcStatusGUI.new
+
+if vertical_layout
+    view = Qt::Splitter::new Qt::Vertical
+else
+    view = Qt::Splitter::new Qt::Horizontal
+end
+view.addWidget wbc_ctrl_gui.widget
+view.setStretchFactor 0, 1
+view.addWidget wbc_status_gui.widget
+view.setStretchFactor 1, 2
+
+view.resize 1800,800
+view.show
+
+Vizkit.exec

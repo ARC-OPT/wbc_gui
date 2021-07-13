@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require "vizkit"
+require "optparse"
+require "wbc_ctrl_gui"
+
+# Parse cmd line options
+hostname = nil
+options = OptionParser.new do |opt|
+    opt.banner = <<-EOD
+ wbc_ctrl_gui [options]
+    EOD
+    opt.on '--host=HOSTNAME', String, 'the host we should contact to find aila_wbc' do |host|
+        hostname = host
+    end
+    opt.on '--help', 'this help message' do
+        puts opt
+        exit(0)
+    end
+end
+args = options.parse(ARGV)
+
+if hostname
+    Orocos::CORBA.name_service.ip = hostname
+    print "Connecting to host ", hostname, "\n"
+end
+
+Orocos.initialize
+#Orocos.load_typekit("base")
+wbc_ctrl_gui = Wbc::WbcCtrlGUI.new
+wbc_ctrl_gui.widget.show
+puts "Press Ctrl-C to exit ..."
+Vizkit.exec

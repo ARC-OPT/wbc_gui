@@ -1,0 +1,14 @@
+<package>
+  <description brief="GUI to control the whole body control framework">
+  WBC Status GUI Will display information about the subtasks and priorities like setpoint and actual control solution, control error, activation, weights etc
+  WBC Ctrl GUI is a GUI to control and monitor the controllers of the whole body control framework
+  </description>
+  <author>Dennis Mronga/dennis.mronga@dfki.de</author>
+  <license></license>
+  <url>http://</url>
+  <logo>http://</logo>
+  <depend package="base/cmake" />
+  <depend package="control/orogen/wbc" />
+  <depend package="control/orogen/ctrl_lib" />
+  <depend package="gui/vizkit" />
+</package>

@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require "wbc_status_gui"
+require "optparse"
+require "vizkit"
+
+hostname = nil
+options = OptionParser.new do |opt|
+    opt.banner = <<-EOD
+    wbc_status_gui [options]
+    EOD
+    opt.on '--host=HOSTNAME', String, 'the host we should contact to find aila_wbc' do |host|
+        hostname = host
+    end
+    opt.on '--help', 'this help message' do
+        puts opt
+        exit(0)
+    end
+end
+args = options.parse(ARGV)
+
+if hostname
+    Orocos::CORBA.name_service.ip = hostname
+    print "Connecting to host ", hostname, "\n"
+end
+
+Orocos.initialize
+
+wbc_status_gui = Wbc::WbcStatusGUI.new
+wbc_status_gui.widget.show
+puts "Press Ctrl-C to exit ..."
+Vizkit.exec
