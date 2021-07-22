@@ -6,6 +6,7 @@ module Wbc
             super
             addPropertyInterface("p_gain",             :vectorXdToRaw, :rawToVectorXd)
             addPropertyInterface("d_gain",             :vectorXdToRaw, :rawToVectorXd)
+            addPropertyInterface("ff_gain",            :vectorXdToRaw, :rawToVectorXd)
             addPropertyInterface("max_control_output", :vectorXdToRaw, :rawToVectorXd)
             addPropertyInterface("dead_zone",          :vectorXdToRaw, :rawToVectorXd)
 
