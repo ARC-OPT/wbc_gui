@@ -111,9 +111,9 @@ void ConstraintUI::updateConstraint(const wbc::ConstraintStatus &constraint){
             getLabel("label_y_ref_", i)->setText(QString::number(constraint.y_ref(i), 'g', 4));
             getLabel("label_y_solution_", i)->setText(QString::number(constraint.y_solution(i), 'g', 4));
             getLabel("label_y_", i)->setText(QString::number(constraint.y(i), 'g', 4));
-            handleWeights(constraint.weights);
         }
     }
+    handleWeights(constraint.weights);
 
     cur_constraint = constraint;
 }

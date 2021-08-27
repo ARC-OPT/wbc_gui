@@ -121,7 +121,6 @@ module Wbc
       def reconfigureWBC()
           joint_weights = @widget.getJointWeights
           @wbc_task = Orocos::name_service.get_provides "wbc::WbcTask"
-          @solver_task = Orocos::name_service.get_provides "wbc::SolverTask"
           wbc_config = @wbc_task.wbc_config
           wbc_config.each do |cfg|
               constraint_widget = @widget.getConstraintInterface cfg.name
@@ -130,7 +129,7 @@ module Wbc
               cfg.activation = constraint_widget.getActivation
           end
           @wbc_task.wbc_config = wbc_config
-          reconfigureTasks [@wbc_task, @solver_task]
+          reconfigureTasks [@wbc_task]
       end
 
       def reconfigureTasks(tasks)
