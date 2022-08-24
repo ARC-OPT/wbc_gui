@@ -1,32 +1,32 @@
-#ifndef CONSTRAINTUI_HPP
-#define CONSTRAINTUI_HPP
+#ifndef TASKUI_HPP
+#define TASKUI_HPP
 
 #include <QWidget>
-#include <wbc/core/ConstraintStatus.hpp>
+#include <wbc/core/TaskStatus.hpp>
 #include <QLabel>
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QInputDialog>
 
 namespace Ui {
-class ConstraintWidget;
+class TaskWidget;
 }
 
 const std::string CART_VAR_NAMES[6] = {"X", "Y", "Z", "rotX", "rotY", "rotZ"};
 
-class ConstraintUI : public QWidget
+class TaskUI : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ConstraintUI(QWidget* parent, QString titel = "Wbc Task");
-    ~ConstraintUI();
+    explicit TaskUI(QWidget* parent, QString titel = "Wbc Task");
+    ~TaskUI();
 
     void setPriority(int priority);
     bool expanded();
 
 public slots:
-    void updateConstraint(const wbc::ConstraintStatus& constraint);
+    void updateTask(const wbc::TaskStatus& task);
     int getPriority();
     QVector<double> getTaskWeights();
     void onActivateClicked();
@@ -45,11 +45,11 @@ signals:
 private:
     bool initialized_;
 
-    Ui::ConstraintWidget* ui;
+    Ui::TaskWidget* ui;
     std::vector<QLabel*> labels;
     std::vector<QLineEdit*> line_edits;
     std::vector<QCheckBox*> cbs;
-    wbc::ConstraintStatus cur_constraint;
+    wbc::TaskStatus cur_task;
 
     QLabel* getLabel(const std::string &prefix, const uint id);
     QLineEdit* getLineEdit(const std::string &prefix, const uint id);

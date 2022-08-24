@@ -1,8 +1,8 @@
 #include "WbcStatusGui.hpp"
-#include <ui_ConstraintUI.h>
+#include <ui_TaskUI.h>
 #include <ui_WbcStatusGui.h>
 #include <ui_JointUI.h>
-#include "ConstraintUI.hpp"
+#include "TaskUI.hpp"
 #include "JointUI.hpp"
 
 WbcStatusGui::WbcStatusGui(QWidget *parent)
@@ -19,7 +19,7 @@ WbcStatusGui::WbcStatusGui(QWidget *parent)
 }
 
 WbcStatusGui::~WbcStatusGui(){
-    clearConstraintUi();
+    clearTaskUi();
     clearSolverUi();
     delete ui;
 
@@ -30,31 +30,31 @@ WbcStatusGui::~WbcStatusGui(){
         delete export_dialog;
 }
 
-void WbcStatusGui::updateConstraint(const wbc::ConstraintStatus &constraint){
-    ((ConstraintUI*)getConstraintInterface(QString::fromStdString(constraint.config.name)))->updateConstraint(constraint);
+void WbcStatusGui::updateTask(const wbc::TaskStatus &task){
+    ((TaskUI*)getTaskInterface(QString::fromStdString(task.config.name)))->updateTask(task);
 }
 
-void WbcStatusGui::clearConstraintUi(){
-    QGridLayout* constraints_layout = (QGridLayout*)ui->groupBoxWBCTasks->layout();
+void WbcStatusGui::clearTaskUi(){
+    QGridLayout* tasks_layout = (QGridLayout*)ui->groupBoxWBCTasks->layout();
 
-    ConstraintInterfaceMap::iterator it;
-    for(it = constraint_uis.begin(); it != constraint_uis.end(); it++)
+    TaskInterfaceMap::iterator it;
+    for(it = task_uis.begin(); it != task_uis.end(); it++)
     {
         disconnect(it->second);
         disconnect(it->second);
         disconnect(it->second);
 
-        constraints_layout->removeWidget(it->second);
+        tasks_layout->removeWidget(it->second);
         delete it->second;
     }
-    constraint_uis.clear();
+    task_uis.clear();
     for(uint i = 0; i < priority_labels.size(); i++){
-        constraints_layout->removeWidget(priority_labels[i]);
+        tasks_layout->removeWidget(priority_labels[i]);
         delete priority_labels[i];
     }
     priority_labels.clear();
-    if(constraints_layout)
-        delete constraints_layout;
+    if(tasks_layout)
+        delete tasks_layout;
 }
 
 void WbcStatusGui::clearSolverUi(){
@@ -70,14 +70,14 @@ void WbcStatusGui::clearSolverUi(){
     solver_ui = 0;
 }
 
-void WbcStatusGui::configureConstraintUI(const std::vector<wbc::ConstraintConfig> &config){
-    clearConstraintUi();
+void WbcStatusGui::configureTaskUI(const std::vector<wbc::TaskConfig> &config){
+    clearTaskUi();
 
     ui->groupBoxWBCTasks->setLayout(new QGridLayout());
-    QGridLayout* constraints_layout = (QGridLayout*)ui->groupBoxWBCTasks->layout();
-    constraints_layout->setContentsMargins(10,-10,0,0);
+    QGridLayout* tasks_layout = (QGridLayout*)ui->groupBoxWBCTasks->layout();
+    tasks_layout->setContentsMargins(10,-10,0,0);
 
-    std::vector< std::vector<wbc::ConstraintConfig> > sorted_config;
+    std::vector< std::vector<wbc::TaskConfig> > sorted_config;
     sortConfigByPriority(config, sorted_config);
 
     int row = 0, column = 1;
@@ -93,23 +93,23 @@ void WbcStatusGui::configureConstraintUI(const std::vector<wbc::ConstraintConfig
                 row++;
             }
 
-            //Add constraint uis to grid layout. Row: Priority. Column: Ascending order
-            ConstraintUI* constraint_ui = new ConstraintUI(this, QString::fromStdString(sorted_config[i][j].name));
+            //Add task uis to grid layout. Row: Priority. Column: Ascending order
+            TaskUI* task_ui = new TaskUI(this, QString::fromStdString(sorted_config[i][j].name));
             QPalette color;
             color.setColor(QPalette::Window, Qt::white);
-            constraint_ui->setStyleSheet("");
-            constraint_ui->setPalette(color);
-            constraint_ui->setAutoFillBackground(true);
-            constraint_ui->setPriority(sorted_config[i][0].priority);
+            task_ui->setStyleSheet("");
+            task_ui->setPalette(color);
+            task_ui->setAutoFillBackground(true);
+            task_ui->setPriority(sorted_config[i][0].priority);
 
-            constraints_layout->addWidget(constraint_ui, row, column++);
-            constraint_uis[QString::fromStdString(sorted_config[i][j].name)] = constraint_ui;
+            tasks_layout->addWidget(task_ui, row, column++);
+            task_uis[QString::fromStdString(sorted_config[i][j].name)] = task_ui;
 
         }
         row++;
     }
 
-    ui->groupBoxWBCTasks->setLayout(constraints_layout);
+    ui->groupBoxWBCTasks->setLayout(tasks_layout);
 
     ui->groupBox->setContentsMargins(0,20,0,0);
     ui->groupBoxWBCTasks->setContentsMargins(0,20,10,10);
@@ -132,8 +132,8 @@ void WbcStatusGui::addPriorityLabel(uint prio, uint row){
     label->setFont(font);
     label->setAlignment(Qt::AlignCenter);
     label->setMinimumWidth(70);
-    QGridLayout* constraints_layout = (QGridLayout*)ui->groupBoxWBCTasks->layout();
-    constraints_layout->addWidget(label, row, 0);
+    QGridLayout* tasks_layout = (QGridLayout*)ui->groupBoxWBCTasks->layout();
+    tasks_layout->addWidget(label, row, 0);
     priority_labels.push_back(label);
 }
 
@@ -150,7 +150,7 @@ void WbcStatusGui::onReconfigureWBCClicked(){
 }
 
 void WbcStatusGui::updateCtrlOut(const base::commands::Joints& ctrl_out){
-    if((int)ctrl_out.size() != solver_ui->getWeights().size())
+    if(ctrl_out.size() != solver_ui->getWeights().size())
         throw std::runtime_error("Size of joint weight vector should be " + std::to_string(solver_ui->getWeights().size()) +
                                  " but is " + std::to_string(ctrl_out.size()));
     solver_ui->updateCtrlOut(ctrl_out);
@@ -164,7 +164,7 @@ void WbcStatusGui::updateJointWeights(const wbc::JointWeights& weights){
     solver_ui->updateWeights(weights);
 }
 
-void WbcStatusGui::sortConfigByPriority(const std::vector<wbc::ConstraintConfig>& config, std::vector< std::vector<wbc::ConstraintConfig> >& sorted_config){
+void WbcStatusGui::sortConfigByPriority(const std::vector<wbc::TaskConfig>& config, std::vector< std::vector<wbc::TaskConfig> >& sorted_config){
 
     // Get highest prio
     int max_prio = 0;
@@ -209,8 +209,8 @@ void WbcStatusGui::onExportConfig(QString path, QString section_name){
     delete export_dialog;
 }
 
-QWidget* WbcStatusGui::getConstraintInterface(const QString &name){
-    if(constraint_uis.count(name) == 0)
-        throw std::runtime_error("No such constraint: " + name.toStdString());
-    return constraint_uis[name];
+QWidget* WbcStatusGui::getTaskInterface(const QString &name){
+    if(task_uis.count(name) == 0)
+        throw std::runtime_error("No such task: " + name.toStdString());
+    return task_uis[name];
 }

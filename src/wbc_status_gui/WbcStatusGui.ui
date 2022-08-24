@@ -188,7 +188,7 @@
         <x>0</x>
         <y>0</y>
         <width>475</width>
-        <height>232</height>
+        <height>234</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
@@ -438,7 +438,7 @@ QGroupBox::title {
 </string>
                    </property>
                    <property name="title">
-                    <string>Constraints</string>
+                    <string>Tasks</string>
                    </property>
                   </widget>
                  </item>

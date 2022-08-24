@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ConstraintWidget</class>
- <widget class="QWidget" name="ConstraintWidget">
+ <class>TaskWidget</class>
+ <widget class="QWidget" name="TaskWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>211</width>
-    <height>115</height>
+    <height>119</height>
    </rect>
   </property>
   <property name="sizePolicy">

@@ -3,18 +3,18 @@
 
 #include <QtGui>
 #include <base/commands/Joints.hpp>
-#include <wbc/core/ConstraintStatus.hpp>
+#include <wbc/core/TaskStatus.hpp>
 #include "ImportExportDialog.hpp"
 #include <wbc/core/QuadraticProgram.hpp>
 
-class ConstraintUI;
+class TaskUI;
 class JointUI;
 
 namespace Ui{
     class MainWidget;
 }
 
-typedef std::map<QString, ConstraintUI*> ConstraintInterfaceMap;
+typedef std::map<QString, TaskUI*> TaskInterfaceMap;
 
 class WbcStatusGui : public QWidget
 {
@@ -24,9 +24,9 @@ public:
     virtual ~WbcStatusGui();
 
 public slots:
-    QWidget* getConstraintInterface(const QString &name);
-    void updateConstraint(const wbc::ConstraintStatus &constraint);
-    void configureConstraintUI(const std::vector<wbc::ConstraintConfig> &config);
+    QWidget* getTaskInterface(const QString &name);
+    void updateTask(const wbc::TaskStatus &task);
+    void configureTaskUI(const std::vector<wbc::TaskConfig> &config);
     void configureSolverUI(const std::vector<std::string>& joint_names);
     void updateCtrlOut(const base::commands::Joints& ctrl_out);
     void updateJointWeights(const wbc::JointWeights& weight);
@@ -48,13 +48,13 @@ signals:
 
 protected:
     void addPriorityLabel(uint prio, uint row);
-    void sortConfigByPriority(const std::vector<wbc::ConstraintConfig>& config,
-                              std::vector< std::vector<wbc::ConstraintConfig> >& sorted_config);
-    void clearConstraintUi();
+    void sortConfigByPriority(const std::vector<wbc::TaskConfig>& config,
+                              std::vector< std::vector<wbc::TaskConfig> >& sorted_config);
+    void clearTaskUi();
     void clearSolverUi();
 
 private:
-    ConstraintInterfaceMap constraint_uis;
+    TaskInterfaceMap task_uis;
     std::vector<QLabel*> priority_labels;
     Ui::MainWidget *ui;
     JointUI* solver_ui;

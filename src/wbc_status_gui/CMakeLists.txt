@@ -4,14 +4,14 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 SET(MOC_HDRS
     WbcStatusGui.hpp
     WbcStatusGuiPlugin.hpp
-    ConstraintUI.hpp
+    TaskUI.hpp
     JointUI.hpp
     ImportExportDialog.hpp
 )
 
 SET(HDRS
     WbcStatusGui.hpp
-    ConstraintUI.hpp
+    TaskUI.hpp
     JointUI.hpp
     ImportExportDialog.hpp
 )

@@ -1,10 +1,10 @@
-#include "ConstraintUI.hpp"
-#include "ui_ConstraintUI.h"
+#include "TaskUI.hpp"
+#include "ui_TaskUI.h"
 #include <sstream>
 
-ConstraintUI::ConstraintUI(QWidget *parent, QString title) :
+TaskUI::TaskUI(QWidget *parent, QString title) :
     QWidget(parent),
-    ui(new Ui::ConstraintWidget){
+    ui(new Ui::TaskWidget){
     ui->setupUi(this);
     ui->labelActive->setAutoFillBackground(true);
     connect(ui->bActivate, SIGNAL(clicked()), this, SLOT(onActivateClicked()));
@@ -13,11 +13,11 @@ ConstraintUI::ConstraintUI(QWidget *parent, QString title) :
     initialized_ = false;
     ui->scrollArea->hide();
     ui->labelTaskName->setText(title);
-    cur_constraint.activation = -1;
-    cur_constraint.timeout = -1;
+    cur_task.activation = -1;
+    cur_task.timeout = -1;
 }
 
-ConstraintUI::~ConstraintUI(){
+TaskUI::~TaskUI(){
     disconnect(ui->bActivate);
     disconnect(ui->bExpand);
     for(uint i = 0; i < labels.size(); i++){
@@ -36,19 +36,19 @@ ConstraintUI::~ConstraintUI(){
     delete ui;
 }
 
-void ConstraintUI::updateConstraint(const wbc::ConstraintStatus &constraint){
+void TaskUI::updateTask(const wbc::TaskStatus &task){
 
-    if(constraint.activation != cur_constraint.activation || constraint.timeout != cur_constraint.timeout){
+    if(task.activation != cur_task.activation || task.timeout != cur_task.timeout){
         std::stringstream ss;
-        ss << "Active: " << constraint.activation << " / \nTimeout: " << constraint.timeout;
+        ss << "Active: " << task.activation << " / \nTimeout: " << task.timeout;
         ui->labelActive->setText(QString::fromStdString(ss.str()));
 
         QString style_sheet("");
-        if( constraint.activation &&  !constraint.timeout ){ // Green label
+        if( task.activation &&  !task.timeout ){ // Green label
             style_sheet = "QLabel { background:  rgba(0, 255, 0, 255); border-radius: 5px;}";
             ui->bActivate->setText("Off");
         }
-        else if( (constraint.activation && constraint.timeout) ){ // Orange label
+        else if( (task.activation && task.timeout) ){ // Orange label
             style_sheet = "QLabel { background:  rgba(255, 100, 0, 255); border-radius: 5px;}";
             ui->bActivate->setText("Off");
         }
@@ -61,15 +61,15 @@ void ConstraintUI::updateConstraint(const wbc::ConstraintStatus &constraint){
 
     if(!initialized_){
         std::vector<std::string> var_names;
-        if(constraint.config.type == wbc::jnt){
-            var_names = constraint.config.joint_names;
+        if(task.config.type == wbc::jnt){
+            var_names = task.config.joint_names;
         }
         else{
             var_names.resize(6);
             var_names.assign(CART_VAR_NAMES, CART_VAR_NAMES+6);
         }
 
-        for(uint i = 0; i < constraint.config.nVariables(); i++)
+        for(uint i = 0; i < task.config.nVariables(); i++)
         {
             QLabel* label = makeFixedSizeLabel("label_name_", i, 70, 1000, true);
             ui->gridLayout->addWidget(label, 0, i+1);
@@ -100,25 +100,25 @@ void ConstraintUI::updateConstraint(const wbc::ConstraintStatus &constraint){
         cb->setFont(font);
         cb->setObjectName("cbUpdateWeights");
         cbs.push_back(cb);
-        ui->gridLayout->addWidget(cb, 5, constraint.config.nVariables() + 2);
+        ui->gridLayout->addWidget(cb, 5, task.config.nVariables() + 2);
         show();
         initialized_ = true;
     }
 
     if(ui->scrollArea->isVisible()){
-        for(uint i = 0; i < constraint.config.nVariables(); i++)
+        for(uint i = 0; i < task.config.nVariables(); i++)
         {
-            getLabel("label_y_ref_", i)->setText(QString::number(constraint.y_ref(i), 'g', 4));
-            getLabel("label_y_solution_", i)->setText(QString::number(constraint.y_solution(i), 'g', 4));
-            getLabel("label_y_", i)->setText(QString::number(constraint.y(i), 'g', 4));
+            getLabel("label_y_ref_", i)->setText(QString::number(task.y_ref(i), 'g', 4));
+            getLabel("label_y_solution_", i)->setText(QString::number(task.y_solution(i), 'g', 4));
+            getLabel("label_y_", i)->setText(QString::number(task.y(i), 'g', 4));
         }
     }
-    handleWeights(constraint.weights);
+    handleWeights(task.weights);
 
-    cur_constraint = constraint;
+    cur_task = task;
 }
 
-void ConstraintUI::handleWeights(const base::VectorXd& weights){
+void TaskUI::handleWeights(const base::VectorXd& weights){
     QCheckBox* cb = ui->scrollArea->findChild<QCheckBox *>("cbUpdateWeights");
     if(!cb)
         throw std::invalid_argument("Cannot find check box with id cbUpdateWeights");
@@ -134,7 +134,7 @@ void ConstraintUI::handleWeights(const base::VectorXd& weights){
     }
 }
 
-QLineEdit* ConstraintUI::makeLineEdit(const std::string &prefix, const uint id, const int min_width, const int max_width){
+QLineEdit* TaskUI::makeLineEdit(const std::string &prefix, const uint id, const int min_width, const int max_width){
     QLineEdit* line_edit = new QLineEdit(this);
     std::stringstream ss;
     ss << prefix << id;
@@ -149,7 +149,7 @@ QLineEdit* ConstraintUI::makeLineEdit(const std::string &prefix, const uint id, 
     return line_edit;
 }
 
-QLabel* ConstraintUI::makeFixedSizeLabel(const std::string &prefix, const uint id, const int min_width, const int max_width, bool bold){
+QLabel* TaskUI::makeFixedSizeLabel(const std::string &prefix, const uint id, const int min_width, const int max_width, bool bold){
     QLabel* label = new QLabel(this);
     label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     label->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
@@ -165,7 +165,7 @@ QLabel* ConstraintUI::makeFixedSizeLabel(const std::string &prefix, const uint i
     return label;
 }
 
-QLabel* ConstraintUI::getLabel(const std::string &prefix, const uint id){
+QLabel* TaskUI::getLabel(const std::string &prefix, const uint id){
 
     std::stringstream ss;
     ss << prefix << id;
@@ -175,7 +175,7 @@ QLabel* ConstraintUI::getLabel(const std::string &prefix, const uint id){
     return label;
 }
 
-QLineEdit* ConstraintUI::getLineEdit(const std::string &prefix, const uint id){
+QLineEdit* TaskUI::getLineEdit(const std::string &prefix, const uint id){
     std::stringstream ss;
     ss << prefix << id;
     QLineEdit* line_edit = ui->scrollArea->findChild<QLineEdit *>(ss.str().c_str());
@@ -184,10 +184,10 @@ QLineEdit* ConstraintUI::getLineEdit(const std::string &prefix, const uint id){
     return line_edit;
 }
 
-QVector<double> ConstraintUI::getTaskWeights(){
+QVector<double> TaskUI::getTaskWeights(){
     uint no_vars;
-    if(cur_constraint.config.type == wbc::jnt)
-        no_vars = cur_constraint.config.joint_names.size();
+    if(cur_task.config.type == wbc::jnt)
+        no_vars = cur_task.config.joint_names.size();
     else
         no_vars = 6;
     QVector<double> weights(no_vars);
@@ -198,36 +198,36 @@ QVector<double> ConstraintUI::getTaskWeights(){
     return weights;
 }
 
-double ConstraintUI::getActivation(){
-    return cur_constraint.activation;
+double TaskUI::getActivation(){
+    return cur_task.activation;
 }
 
-int ConstraintUI::getPriority() {
-    return cur_constraint.config.priority;
+int TaskUI::getPriority() {
+    return cur_task.config.priority;
 }
 
-void ConstraintUI::onActivateClicked(){
-    if(cur_constraint.activation > 0)
-        emit(ConstraintUI::deactivate());
+void TaskUI::onActivateClicked(){
+    if(cur_task.activation > 0)
+        emit(TaskUI::deactivate());
     else
-        emit(ConstraintUI::activate());
+        emit(TaskUI::activate());
 }
 
-void ConstraintUI::onPriorityChanged(){
+void TaskUI::onPriorityChanged(){
     bool ok = false;
     int new_prio = QInputDialog::getInt(this, "Set new priority",
                                             "Priority:", getPriority(), 0, 1000, 1 , &ok);
     if (ok and new_prio >= 0){
         setPriority(new_prio);
-        emit(ConstraintUI::priorityChanged(new_prio));
+        emit(TaskUI::priorityChanged(new_prio));
     }
 }
 
-void ConstraintUI::onTaskWeightsChanged(){
-    emit(ConstraintUI::taskWeightsChanged());
+void TaskUI::onTaskWeightsChanged(){
+    emit(TaskUI::taskWeightsChanged());
 }
 
-void ConstraintUI::onExpandClicked(){
+void TaskUI::onExpandClicked(){
     if(ui->scrollArea->isHidden())
         ui->scrollArea->show();
     else
@@ -237,11 +237,11 @@ void ConstraintUI::onExpandClicked(){
     this->adjustSize();
 }
 
-void ConstraintUI::setPriority(int prio){
-    cur_constraint.config.priority = prio;
+void TaskUI::setPriority(int prio){
+    cur_task.config.priority = prio;
 }
 
-bool ConstraintUI::expanded(){
+bool TaskUI::expanded(){
     return !ui->scrollArea->isHidden();
 }
 
