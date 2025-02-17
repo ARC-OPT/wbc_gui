@@ -1,7 +1,7 @@
 #include "WbcCtrlGuiPlugin.hpp"
 #include "WbcCtrlGui.hpp"
 
-Q_EXPORT_PLUGIN2(WbcCtrlGui, WbcCtrlGuiPlugin)
+//Q_EXPORT_PLUGIN2(WbcCtrlGui, WbcCtrlGuiPlugin)
 
 WbcCtrlGuiPlugin::WbcCtrlGuiPlugin(QObject *parent)
     : QObject(parent)

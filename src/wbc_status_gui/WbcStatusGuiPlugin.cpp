@@ -1,7 +1,7 @@
 #include "WbcStatusGuiPlugin.hpp"
 #include "WbcStatusGui.hpp"
 
-Q_EXPORT_PLUGIN2(WbcStatusGui, WbcStatusGuiPlugin)
+//Q_EXPORT_PLUGIN2(WbcStatusGui, WbcStatusGuiPlugin)
 
 WbcStatusGuiPlugin::WbcStatusGuiPlugin(QObject *parent)
     : QObject(parent)

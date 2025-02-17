@@ -3,6 +3,7 @@
 cmake_minimum_required(VERSION 2.6)
 find_package(Rock)
 rock_init(wbc_gui 0.1)
+rock_feature(NOCURDIR)
 rock_standard_layout()
 
 INSTALL( PROGRAMS bin/wbc_ctrl_gui
