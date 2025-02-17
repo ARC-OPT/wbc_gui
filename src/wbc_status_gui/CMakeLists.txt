@@ -29,10 +29,11 @@ SET(QtApp_RCCS resources.qrc)
 rock_vizkit_widget(wbc_status_gui
     SOURCES ${SRCS} ${QtApp_RCC_SRCS}
     HEADERS ${HDRS}
-    MOC ${MOC_HDRS}
-    DEPS_PKGCONFIG QtCore QtGui wbc-core
+    MOC5 ${MOC_HDRS}
+    DEPS_PKGCONFIG wbc-core
+    DEPS_TARGET Qt5::Widgets
     UI ${UI_FILES}
 )
 
-QT4_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
+QT5_ADD_RESOURCES(QtApp_RCC_SRCS ${QtApp_RCCS})
 
